@@ -2,11 +2,10 @@
 
 1. edit files/genesis.json, modify nonce and config.chainId
 2. use terraform to deploy infrastructure ``terraform plan && terraform apply``
-3. upload files/genesis.json to all nodes
-4. bootnode
+3. bootnode
     * login to bootnode
         ```bash
-        ssh admin@(terraform output bootnode_public_ip)
+        ssh admin@$(terraform output bootnode_public_ip)
         ```
     * generate key
         ```bash
@@ -18,10 +17,10 @@
         bootnode -nodekey boot.key
         ```
 4. geth miners
-    * login to each miner, the IPs are: ``terraform output node_public_ips``
+    * login to each miner, the IPs are: ``terraform output node_public_ip``
     * initialize using genesis.json
         ```bash
-        geth init genesis.json
+        geth init /tmp/genesis.json
         ```
     * create ethereum account to store mining profits
         ```bash
@@ -29,7 +28,7 @@
         ```
     * run miner
         ```bash
-        geth -networkid $(jq .config.chainId < genesis.json) \
+        geth -networkid $(jq .config.chainId < /tmp/genesis.json) \
              -bootnodes $BOOTNODE_ADDRESS \
              -mine -minerthreads=1 \
              -etherbase=0x$(jq -r .address < ~/.ethereum/keystore/UTC*) \
@@ -47,7 +46,7 @@
         ```
     * run miner
         ```bash
-        geth -networkid $(jq .config.chainId < genesis.json) \
+        geth -networkid $(jq .config.chainId < files/genesis.json) \
              -bootnodes $BOOTNODE_ADDRESS \
              -mine -minerthreads=1 \
              -etherbase=0x$(jq -r .address < ~/.ethereum/keystore/UTC*) \
@@ -55,3 +54,4 @@
         ```
     * attach to console: ``geth attach``
     * install and run mist: https://github.com/ethereum/mist
+

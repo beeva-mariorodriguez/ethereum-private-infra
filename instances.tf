@@ -9,6 +9,23 @@ resource "aws_instance" "ethereum_bootnode" {
     "${aws_security_group.ssh.id}",
     "${aws_security_group.ethereum_bootnode.id}",
   ]
+
+  provisioner "file" {
+    source      = "scripts/setup-vm.sh"
+    destination = "/tmp/setup-vm.sh"
+  }
+
+  provisioner "file" {
+    source      = "files/genesis.json"
+    destination = "/tmp/genesis.json"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/setup-vm.sh",
+      "/tmp/setup-vm.sh bootnode",
+    ]
+  }
 }
 
 resource "aws_instance" "ethereum_node" {
@@ -23,4 +40,21 @@ resource "aws_instance" "ethereum_node" {
     "${aws_security_group.ssh.id}",
     "${aws_security_group.ethereum_node.id}",
   ]
+
+  provisioner "file" {
+    source      = "scripts/setup-vm.sh"
+    destination = "/tmp/setup-vm.sh"
+  }
+
+  provisioner "file" {
+    source      = "files/genesis.json"
+    destination = "/tmp/genesis.json"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/setup-vm.sh",
+      "/tmp/setup-vm.sh miner",
+    ]
+  }
 }
