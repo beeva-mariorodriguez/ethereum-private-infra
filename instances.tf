@@ -26,6 +26,11 @@ resource "aws_instance" "ethereum_bootnode" {
       "/tmp/setup-vm.sh bootnode",
     ]
   }
+
+  connection {
+    type = "ssh"
+    user = "admin"
+  }
 }
 
 resource "aws_instance" "ethereum_node" {
@@ -56,5 +61,10 @@ resource "aws_instance" "ethereum_node" {
       "chmod +x /tmp/setup-vm.sh",
       "/tmp/setup-vm.sh miner",
     ]
+  }
+
+  connection {
+    type = "ssh"
+    user = "admin"
   }
 }
