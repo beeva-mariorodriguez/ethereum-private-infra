@@ -1,7 +1,14 @@
 # private ethereum network
 
 1. edit files/genesis.json, modify nonce and config.chainId
-2. use terraform to deploy infrastructure ``terraform plan && terraform apply``
+2. use terraform to deploy infrastructure 
+    * install terraform
+    * run terraform:
+        ```
+        terraform init
+        terraform plan
+        terraform apply -var 'keyname=YOUR AWS KEYNAME'
+        ```
 3. bootnode
     * login to bootnode
         ```bash
