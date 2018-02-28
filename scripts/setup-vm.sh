@@ -1,25 +1,8 @@
 #!/bin/bash
 
-function install_docker {
-	sudo apt-get remove -y docker docker-engine docker.io
-	sudo apt-get install -y \
-		apt-transport-https \
-		ca-certificates \
-		curl \
-		gnupg2 \
-		software-properties-common
-	curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-    sudo add-apt-repository \
-        "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-        $(lsb_release -cs) \
-        stable"
-	sudo apt-get update
-	sudo apt-get install -y docker-ce
-}
-
 function run_bootnode {
     privkey=$(cat /tmp/boot.key)
-    sudo docker container run \
+    docker container run \
         --detach \
         --name bootnode \
         --net host \
@@ -33,7 +16,7 @@ function run_miner {
     pubkey=$(cat /tmp/boot.pub)
     networkid=$(jq .config.chainId < /tmp/genesis.json)
     # initialize geth using genesis.json, .ethereum files stored at volume dotethereum
-    sudo docker container run \
+    docker container run \
         --name gethinit \
         --net host \
         --rm \
@@ -43,7 +26,7 @@ function run_miner {
         geth init /genesis.json
 
     # run the miner, 
-    sudo docker container run \
+    docker container run \
         --detach \
         --name miner \
         --net host \
@@ -62,12 +45,9 @@ function run_miner {
 
 case $1 in
     "bootnode")
-        install_docker
         run_bootnode
         ;;
     "miner")
-        install_docker
-        sudo apt-get install -y jq
         run_miner
         ;;
 esac

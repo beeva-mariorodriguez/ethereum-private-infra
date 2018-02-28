@@ -1,5 +1,5 @@
 resource "aws_instance" "ethereum_bootnode" {
-  ami           = "${data.aws_ami.stretch.image_id}"
+  ami           = "${data.aws_ami.coreos.image_id}"
   instance_type = "t2.medium"
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
@@ -34,12 +34,12 @@ resource "aws_instance" "ethereum_bootnode" {
 
   connection {
     type = "ssh"
-    user = "admin"
+    user = "core"
   }
 }
 
 resource "aws_instance" "ethereum_node" {
-  ami           = "${data.aws_ami.stretch.image_id}"
+  ami           = "${data.aws_ami.coreos.image_id}"
   instance_type = "t2.medium"
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
@@ -79,6 +79,6 @@ resource "aws_instance" "ethereum_node" {
 
   connection {
     type = "ssh"
-    user = "admin"
+    user = "core"
   }
 }
