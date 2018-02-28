@@ -25,14 +25,6 @@ function run_miner {
         "${ETHEREUM_IMAGE}" \
         geth init /genesis.json
 
-    # docker container run \
-    #     --name account \
-    #     --net host \
-    #     --rm \
-    #     --volume dotethereum:/root/.ethereum \
-    #     "${ETHEREUM_IMAGE}" \
-    #     geth account new --password /dev/null
-
     # run the miner, 
     docker container run \
         --detach \
