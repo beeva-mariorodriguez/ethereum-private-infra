@@ -29,10 +29,16 @@
         ```bash
         geth account new
         ```
+    * bootnode address
+        ```bash
+        BOOTNODE_ADDRESS="enode://$(cat keys/boot.pub)@$(terraform output bootnode_public_ip):30301"
+        echo $BOOTNODE_ADDRESS
+        ```
     * run miner
         ```bash
         geth -networkid $(jq .config.chainId < files/genesis.json) \
-             -bootnodes $BOOTNODE_ADDRESS \
+             -maxpeers 128 \
+             -bootnodes "${BOOTNODE_ADDRESS}" \
              -mine -minerthreads=1 \
              -etherbase=0x$(jq -r .address < ~/.ethereum/keystore/UTC*) \
              -rpc

@@ -52,7 +52,7 @@ function run_miner {
         "${ETHEREUM_IMAGE}" \
         geth -networkid "${networkid}" \
              -maxpeers 128 \
-             -bootnodes "${pubkey}@${BOOTNODE_IP}:30301" \
+             -bootnodes "enode://${pubkey}@${BOOTNODE_IP}:30301" \
              -mine \
              -minerthreads 1 \
              -etherbase "${ETHERBASE}" \
