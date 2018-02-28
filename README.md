@@ -36,6 +36,7 @@
     * run miner
         ```bash
         geth -networkid $(jq .config.chainId < /tmp/genesis.json) \
+             -maxpeers 128 \
              -bootnodes $BOOTNODE_ADDRESS \
              -mine -minerthreads=1 \
              -etherbase=0x$(jq -r .address < ~/.ethereum/keystore/UTC*) \
