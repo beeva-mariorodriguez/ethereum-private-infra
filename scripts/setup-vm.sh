@@ -21,9 +21,17 @@ function run_miner {
         --net host \
         --rm \
         --volume /tmp/genesis.json:/genesis.json \
-        --volume dotethereum:/.ethereum \
+        --volume dotethereum:/root/.ethereum \
         "${ETHEREUM_IMAGE}" \
         geth init /genesis.json
+
+    # docker container run \
+    #     --name account \
+    #     --net host \
+    #     --rm \
+    #     --volume dotethereum:/root/.ethereum \
+    #     "${ETHEREUM_IMAGE}" \
+    #     geth account new --password /dev/null
 
     # run the miner, 
     docker container run \
@@ -38,7 +46,7 @@ function run_miner {
              -bootnodes "enode://${pubkey}@${BOOTNODE_IP}:30301" \
              -mine \
              -minerthreads 1 \
-             -etherbase "${ETHERBASE}" \
+             -etherbase "0x${ETHERBASE}" \
              -rpc \
              -nat "extip:${public_ip}"
 }
