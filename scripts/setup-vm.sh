@@ -40,7 +40,8 @@ function run_miner {
              -minerthreads 1 \
              -etherbase "0x${ETHERBASE}" \
              -rpc \
-             -nat "extip:${public_ip}"
+             -nat "extip:${public_ip}" \
+             -gasprice 0
 }
 
 case $1 in
