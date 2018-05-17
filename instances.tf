@@ -89,20 +89,44 @@ resource "aws_instance" "bastion" {
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
   depends_on    = ["aws_instance.ethereum_bootnode"]
+
   vpc_security_group_ids = [
     "${aws_security_group.allow_outbound.id}",
-    "${aws_security_group.ssh.id}"
+    "${aws_security_group.ssh.id}",
+    "${aws_security_group.ethereum_node.id}",
   ]
 
+  provisioner "local-exec" {
+    command = "scripts/generate_account.sh"
+  }
+
   provisioner "file" {
-    source = "scripts/setup-vm.sh"
+    source      = "scripts/setup-vm.sh"
     destination = "/tmp/setup-vm.sh"
+  }
+
+  provisioner "file" {
+    source      = "keys/boot.pub"
+    destination = "/tmp/boot.pub"
+  }
+
+  provisioner "file" {
+    source      = "files/genesis.json"
+    destination = "/tmp/genesis.json"
+  }
+
+  provisioner "file" {
+    source      = "keystore"
+    destination = "/tmp"
   }
 
   provisioner "remote-exec" {
     inline = [
+      "export ETHEREUM_IMAGE=${var.ethereum_image}",
+      "export ETHERBASE=${var.etherbase}",
+      "export BOOTNODE_IP=${aws_instance.ethereum_bootnode.public_ip}",
       "chmod +x /tmp/setup-vm.sh",
-      "/tmp/setup-vm.sh bastion"
+      "/tmp/setup-vm.sh bastion",
     ]
   }
 
@@ -111,5 +135,3 @@ resource "aws_instance" "bastion" {
     user = "ubuntu"
   }
 }
-
-
