@@ -37,7 +37,7 @@ function run_miner {
              -maxpeers 128 \
              -bootnodes "enode://${pubkey}@${BOOTNODE_IP}:30301" \
              -mine \
-             -minerthreads 1 \
+             -minerthreads 2 \
              -etherbase "0x${ETHERBASE}" \
              -rpc \
              -nat "extip:${public_ip}" \
