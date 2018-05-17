@@ -44,12 +44,30 @@ function run_miner {
              -gasprice 0
 }
 
+function install_nodejs_truffle {
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    sudo npm install -g truffle
+}
+
+function install_ethereum {
+    sudo add-apt-repository -y ppa:ethereum/ethereum
+    sudo apt-get update
+    sudo apt-get install -y ethereum
+}
+
 case $1 in
     "bootnode")
         run_bootnode
         ;;
     "miner")
         run_miner
+        ;;
+    "bastion")
+        sudo apt-get update
+        sudo apt-get install -y git
+        install_nodejs_truffle
+        install_ethereum
         ;;
 esac
 
