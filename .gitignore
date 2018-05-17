@@ -33,4 +33,4 @@ tags
 keys/boot.key
 keys/boot.pub
 .terraform.tfstate.lock.info
-geth_datadir
+keystore/*
