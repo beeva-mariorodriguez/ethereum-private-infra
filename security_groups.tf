@@ -41,6 +41,15 @@ resource "aws_security_group" "ethereum_node" {
   vpc_id = "${aws_vpc.workshop.id}"
 
   ingress {
+    from_port = 8080
+    to_port   = 8080
+    protocol  = "tcp"
+
+    # self      = true
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 30303
     to_port   = 30303
     protocol  = "tcp"
