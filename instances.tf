@@ -3,6 +3,9 @@ resource "aws_instance" "ethereum_bootnode" {
   instance_type = "t2.medium"
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
+  tags {
+    Name = "bootnode"
+  }
 
   vpc_security_group_ids = [
     "${aws_security_group.allow_outbound.id}",
@@ -45,6 +48,9 @@ resource "aws_instance" "ethereum_node" {
   key_name      = "${var.keyname}"
   count         = 2
   depends_on    = ["aws_instance.ethereum_bootnode"]
+  tags {
+    Name = "miner"
+  }
 
   vpc_security_group_ids = [
     "${aws_security_group.allow_outbound.id}",
@@ -94,6 +100,9 @@ resource "aws_instance" "bastion" {
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
   depends_on    = ["aws_instance.ethereum_bootnode"]
+  tags {
+    Name = "bastion"
+  }
 
   vpc_security_group_ids = [
     "${aws_security_group.allow_outbound.id}",
