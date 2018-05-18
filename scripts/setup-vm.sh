@@ -11,6 +11,18 @@ function run_bootnode {
         bootnode -nodekeyhex "${privkey}"
 }
 
+function run_rpc_revproxy {
+    sudo mkdir -p /etc/nginx/conf.d
+    sudo mv /tmp/default.conf /etc/nginx/conf.d/
+    docker container run \
+        --detach \
+        --name proxy \
+        --net host \
+        --volume /etc/nginx/conf.d:/etc/nginx/conf.d \
+        --restart always \
+        nginx:stable
+}
+
 function run_miner {
     public_ip=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
     pubkey=$(cat /tmp/boot.pub)
@@ -117,6 +129,7 @@ case $1 in
         ;;
     "miner")
         run_miner
+        run_rpc_revproxy
         ;;
     "bastion")
         sudo apt-get update

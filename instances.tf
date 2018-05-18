@@ -53,6 +53,11 @@ resource "aws_instance" "ethereum_node" {
   ]
 
   provisioner "file" {
+    source      = "files/default.conf"
+    destination = "/tmp/default.conf"
+  }
+
+  provisioner "file" {
     source      = "keys/boot.pub"
     destination = "/tmp/boot.pub"
   }
