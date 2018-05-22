@@ -52,6 +52,7 @@ function run_miner {
              -minerthreads 2 \
              -etherbase "0x${ETHERBASE}" \
              -rpc \
+             -rpcapi "db,eth,net,web3,personal" \
              -nat "extip:${public_ip}" \
              -gasprice 0
 }
