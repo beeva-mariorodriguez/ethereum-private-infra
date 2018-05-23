@@ -3,6 +3,7 @@ resource "aws_instance" "ethereum_bootnode" {
   instance_type = "t2.medium"
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
+
   tags {
     Name = "bootnode"
   }
@@ -48,6 +49,7 @@ resource "aws_instance" "ethereum_node" {
   key_name      = "${var.keyname}"
   count         = 2
   depends_on    = ["aws_instance.ethereum_bootnode"]
+
   tags {
     Name = "miner"
   }
@@ -100,6 +102,7 @@ resource "aws_instance" "bastion" {
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
   depends_on    = ["aws_instance.ethereum_bootnode"]
+
   tags {
     Name = "bastion"
   }
