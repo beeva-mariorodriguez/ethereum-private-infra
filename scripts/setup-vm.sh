@@ -126,9 +126,11 @@ function install_ethereum {
 
 case $1 in
     "bootnode")
+        echo "REBOOT_STRATEGY=off" | sudo tee -a /etc/coreos/update.conf
         run_bootnode
         ;;
     "miner")
+        echo "REBOOT_STRATEGY=off" | sudo tee -a /etc/coreos/update.conf
         run_miner
         run_rpc_revproxy
         ;;
