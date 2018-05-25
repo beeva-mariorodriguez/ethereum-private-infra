@@ -54,6 +54,7 @@ function run_miner {
              -rpc \
              -rpcapi "db,eth,net,web3,personal" \
              -nat "extip:${public_ip}" \
+             -rpccorsdomain '*' \
              -gasprice 0
 }
 
