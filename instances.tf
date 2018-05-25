@@ -47,7 +47,7 @@ resource "aws_instance" "ethereum_node" {
   instance_type = "t2.medium"
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
-  count         = 3
+  count         = 2
   depends_on    = ["aws_instance.ethereum_bootnode"]
 
   tags {
@@ -73,6 +73,11 @@ resource "aws_instance" "ethereum_node" {
   provisioner "file" {
     source      = "scripts/setup-vm.sh"
     destination = "/tmp/setup-vm.sh"
+  }
+
+  provisioner "file" {
+    source      = "keystore"
+    destination = "/tmp"
   }
 
   provisioner "file" {

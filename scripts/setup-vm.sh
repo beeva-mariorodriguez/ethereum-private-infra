@@ -38,6 +38,16 @@ function run_miner {
         "${ETHEREUM_IMAGE}" \
         geth init /genesis.json
 
+    # fuck it
+    sudo docker container run \
+        --name importaccount \
+        --net host \
+        --rm \
+        --volume /tmp/keystore:/keystore \
+        --volume dotethereum:/root/.ethereum \
+        "${ETHEREUM_IMAGE}" \
+           cp -av /keystore /root/.ethereum
+
     # run the miner, 
     docker container run \
         --detach \
@@ -80,7 +90,7 @@ function run_light_client {
         --volume /tmp/keystore:/keystore \
         --volume dotethereum:/root/.ethereum \
         "${ETHEREUM_IMAGE}" \
-        cp -av /keystore /root/.ethereum
+            cp -av /keystore /root/.ethereum
 
     # run the client
     sudo docker container run \
