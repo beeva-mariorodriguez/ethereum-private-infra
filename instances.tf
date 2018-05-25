@@ -47,7 +47,7 @@ resource "aws_instance" "ethereum_node" {
   instance_type = "t2.medium"
   subnet_id     = "${aws_subnet.ethereum.id}"
   key_name      = "${var.keyname}"
-  count         = 2
+  count         = 3
   depends_on    = ["aws_instance.ethereum_bootnode"]
 
   tags {
@@ -135,6 +135,11 @@ resource "aws_instance" "bastion" {
   provisioner "file" {
     source      = "keystore"
     destination = "/tmp"
+  }
+
+  provisioner "file" {
+    source      = "files/bastion.conf"
+    destination = "/tmp/default.conf"
   }
 
   provisioner "remote-exec" {

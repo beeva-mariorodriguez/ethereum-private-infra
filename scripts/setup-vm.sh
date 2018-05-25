@@ -11,14 +11,15 @@ function run_bootnode {
         bootnode -nodekeyhex "${privkey}"
 }
 
-function run_rpc_revproxy {
+function run_nginx {
     sudo mkdir -p /etc/nginx/conf.d
     sudo mv /tmp/default.conf /etc/nginx/conf.d/
     docker container run \
         --detach \
-        --name proxy \
+        --name nginx \
         --net host \
         --volume /etc/nginx/conf.d:/etc/nginx/conf.d \
+        --volume /srv:/srv \
         --restart always \
         nginx:stable
 }
@@ -133,7 +134,7 @@ case $1 in
     "miner")
         echo "REBOOT_STRATEGY=off" | sudo tee -a /etc/coreos/update.conf
         run_miner
-        run_rpc_revproxy
+        run_nginx
         ;;
     "bastion")
         sudo apt-get update
@@ -143,6 +144,8 @@ case $1 in
         install_ethereum
         git clone https://github.com/beeva-mariorodriguez/innovation_day_token
         run_light_client
+        sudo mkdir -p /srv/contracts
+        run_nginx_bastion
         ;;
 esac
 
