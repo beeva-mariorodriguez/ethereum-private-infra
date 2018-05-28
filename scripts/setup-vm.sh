@@ -12,6 +12,7 @@ function run_bootnode {
 }
 
 function run_nginx {
+    sudo systemctl enable docker
     sudo mkdir -p /etc/nginx/conf.d
     sudo mv /tmp/default.conf /etc/nginx/conf.d/
     docker container run \
@@ -25,6 +26,7 @@ function run_nginx {
 }
 
 function run_miner {
+    sudo systemctl enable docker
     public_ip=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
     pubkey=$(cat /tmp/boot.pub)
     networkid=$(jq .config.chainId < /tmp/genesis.json)
@@ -60,6 +62,7 @@ function run_miner {
 }
 
 function run_light_client {
+    sudo systemctl enable docker
     public_ip=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
     pubkey=$(cat /tmp/boot.pub)
     networkid=$(jq .config.chainId < /tmp/genesis.json)
