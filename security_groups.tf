@@ -32,7 +32,7 @@ resource "aws_security_group" "ethereum_bootnode" {
     protocol  = "udp"
 
     # security_groups = ["${aws_security_group.ethereum_node.id}"]
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${aws_subnet.ethereum.cidr_block}"]
   }
 }
 
@@ -41,29 +41,28 @@ resource "aws_security_group" "ethereum_node" {
   vpc_id = "${aws_vpc.workshop.id}"
 
   ingress {
-    from_port = 8080
-    to_port   = 8080
-    protocol  = "tcp"
-
-    # self      = true
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 30303
+    to_port     = 30303
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_subnet.ethereum.cidr_block}"]
   }
 
   ingress {
-    from_port = 30303
-    to_port   = 30303
-    protocol  = "tcp"
-
-    # self      = true
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 30303
+    to_port     = 30303
+    protocol    = "udp"
+    cidr_blocks = ["${aws_subnet.ethereum.cidr_block}"]
   }
+}
+
+resource "aws_security_group" "ethereum_proxy" {
+  name   = "ethereum_proxy"
+  vpc_id = "${aws_vpc.workshop.id}"
 
   ingress {
-    from_port = 30303
-    to_port   = 30303
-    protocol  = "udp"
-
-    # self      = true
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

@@ -12,7 +12,6 @@ function run_bootnode {
 }
 
 function run_nginx {
-    sudo systemctl enable docker
     sudo mkdir -p /etc/nginx/conf.d
     sudo mv /tmp/default.conf /etc/nginx/conf.d/
     docker container run \
@@ -26,8 +25,7 @@ function run_nginx {
 }
 
 function run_miner {
-    sudo systemctl enable docker
-    public_ip=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+    private_ip=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
     pubkey=$(cat /tmp/boot.pub)
     networkid=$(jq .config.chainId < /tmp/genesis.json)
     # initialize geth using genesis.json, .ethereum files stored at volume dotethereum
@@ -55,15 +53,12 @@ function run_miner {
              -minerthreads 2 \
              -etherbase "0x${ETHERBASE}" \
              -rpc \
-             -rpcapi "db,eth,net,web3,personal" \
-             -nat "extip:${public_ip}" \
-             -rpccorsdomain '*' \
+             -nat "extip:${private_ip}" \
              -gasprice 0
 }
 
 function run_light_client {
-    sudo systemctl enable docker
-    public_ip=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+    private_ip=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
     pubkey=$(cat /tmp/boot.pub)
     networkid=$(jq .config.chainId < /tmp/genesis.json)
     # initialize geth using genesis.json, .ethereum files stored at volume dotethereum
@@ -96,7 +91,9 @@ function run_light_client {
         geth -networkid "${networkid}" \
              -maxpeers 128 \
              -bootnodes "enode://${pubkey}@${BOOTNODE_IP}:30301" \
-             -rpc
+             -rpccorsdomain '*' \
+             -rpc \
+             -rpcapi "db,eth,net,web3,personal"
 }
 
 function install_docker {
@@ -129,26 +126,39 @@ function install_ethereum {
     sudo apt-get install -y ethereum
 }
 
+function setup_coreos {
+    sudo systemctl enable docker
+    echo "REBOOT_STRATEGY=off" | sudo tee -a /etc/coreos/update.conf
+}
+
+function setup_ubuntu {
+    sudo apt-get update
+    sudo apt-get install -y git jq
+    install_docker
+}
+
 case $1 in
     "bootnode")
-        echo "REBOOT_STRATEGY=off" | sudo tee -a /etc/coreos/update.conf
+        setup_coreos
         run_bootnode
         ;;
     "miner")
-        echo "REBOOT_STRATEGY=off" | sudo tee -a /etc/coreos/update.conf
+        setup_coreos
         run_miner
+        ;;
+    "proxy")
+        setup_coreos
+        run_light_client
         run_nginx
         ;;
     "bastion")
-        sudo apt-get update
-        sudo apt-get install -y git jq
-        install_docker
+        setup_ubuntu
         install_nodejs_truffle
         install_ethereum
         git clone https://github.com/beeva-mariorodriguez/innovation_day_token
         run_light_client
         sudo mkdir -p /srv/contracts
-        run_nginx_bastion
+        run_nginx
         ;;
 esac
 
