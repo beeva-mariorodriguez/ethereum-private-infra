@@ -2,7 +2,7 @@
 
 function run_bootnode {
     privkey=$(cat /tmp/boot.key)
-    docker container run \
+    sudo docker container run \
         --detach \
         --name bootnode \
         --net host \
@@ -13,8 +13,8 @@ function run_bootnode {
 
 function run_nginx {
     sudo mkdir -p /etc/nginx/conf.d
-    sudo mv /tmp/default.conf /etc/nginx/conf.d/
-    docker container run \
+    sudo cp /tmp/default.conf /etc/nginx/conf.d/
+    sudo docker container run \
         --detach \
         --name nginx \
         --net host \
@@ -24,22 +24,37 @@ function run_nginx {
         nginx:stable
 }
 
-function run_miner {
-    private_ip=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
-    pubkey=$(cat /tmp/boot.pub)
-    networkid=$(jq .config.chainId < /tmp/genesis.json)
+function init_geth_container {
     # initialize geth using genesis.json, .ethereum files stored at volume dotethereum
-    docker container run \
+    sudo docker container run \
         --name gethinit \
         --net host \
         --rm \
         --volume /tmp/genesis.json:/genesis.json \
         --volume dotethereum:/root/.ethereum \
         "${ETHEREUM_IMAGE}" \
-        geth init /genesis.json
+        geth init /genesis.json    
+}
+
+function add_eth_account {
+    # add private keys @ ./keystore to the dotethereum volume
+    sudo docker container run \
+        --name importaccount \
+        --net host \
+        --rm \
+        --volume /tmp/keystore:/keystore \
+        --volume dotethereum:/root/.ethereum \
+        "${ETHEREUM_IMAGE}" \
+        cp -av /keystore /root/.ethereum
+}
+
+function run_miner {
+    private_ip=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+    pubkey=$(cat /tmp/boot.pub)
+    networkid=$(jq .config.chainId < /tmp/genesis.json)
 
     # run the miner, 
-    docker container run \
+    sudo docker container run \
         --detach \
         --name miner \
         --net host \
@@ -53,7 +68,6 @@ function run_miner {
              -minerthreads 2 \
              -etherbase "0x${ETHERBASE}" \
              -rpc \
-             -nat "extip:${private_ip}" \
              -gasprice 0
 }
 
@@ -61,24 +75,6 @@ function run_light_client {
     private_ip=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
     pubkey=$(cat /tmp/boot.pub)
     networkid=$(jq .config.chainId < /tmp/genesis.json)
-    # initialize geth using genesis.json, .ethereum files stored at volume dotethereum
-    sudo docker container run \
-        --name gethinit \
-        --net host \
-        --rm \
-        --volume /tmp/genesis.json:/genesis.json \
-        --volume dotethereum:/root/.ethereum \
-        "${ETHEREUM_IMAGE}" \
-        geth init /genesis.json
-
-    sudo docker container run \
-        --name importaccount \
-        --net host \
-        --rm \
-        --volume /tmp/keystore:/keystore \
-        --volume dotethereum:/root/.ethereum \
-        "${ETHEREUM_IMAGE}" \
-        cp -av /keystore /root/.ethereum
 
     # run the client
     sudo docker container run \
@@ -144,10 +140,12 @@ case $1 in
         ;;
     "miner")
         setup_coreos
+        init_geth_container
         run_miner
         ;;
     "proxy")
         setup_coreos
+        init_geth_container
         run_light_client
         run_nginx
         ;;
@@ -156,9 +154,10 @@ case $1 in
         install_nodejs_truffle
         install_ethereum
         git clone https://github.com/beeva-mariorodriguez/innovation_day_token
+        init_geth_container
+        add_eth_account
         run_light_client
         sudo mkdir -p /srv/contracts
         run_nginx
         ;;
 esac
-

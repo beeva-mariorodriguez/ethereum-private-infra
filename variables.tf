@@ -1,5 +1,9 @@
 variable "keyname" {
-  default = "workshop"
+  default = "ethereum"
+}
+
+variable "region" {
+  default = "us-east-2"
 }
 
 variable "ethereum_image" {
