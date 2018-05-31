@@ -13,3 +13,7 @@ output "etherbase" {
 output "ethereum_image" {
   value = "${var.ethereum_image}"
 }
+
+output "apigateway" {
+  value = "${aws_api_gateway_deployment.ethereum.invoke_url}"
+}
